@@ -1,45 +1,59 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const axios = require('axios');
+const express = require("express");
+const bodyParser = require("body-parser");
+const axios = require("axios");
+const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
+const port = process.env.PORT || 10000;
+
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static('public')); // لتشغيل index.html من مجلد public
 
-const API_KEY = 'c2a881aa8cecb07069cff3b0b437997e0a47c9d6bb3037c26937aea28868a0ac';
-const TOGETHER_API_URL = 'https://api.together.ai/v1/chat/completions';
-
-app.post('/ask', async (req, res) => {
+// نقطة الاستقبال لأسئلة المستخدم
+app.post("/ask", async (req, res) => {
   const question = req.body.question;
-  const finalPrompt = `أجب كخبير قانوني يمني معتمد، لا تخرج عن القوانين اليمنية. السؤال: ${question}`;
+
+  if (!question) {
+    return res.status(400).json({ error: "⚠️ الرجاء كتابة سؤال." });
+  }
 
   try {
     const response = await axios.post(
-      TOGETHER_API_URL,
+      "https://api.together.xyz/v1/chat/completions",
       {
-        model: 'meta-llama/Llama-3-70b-chat-hf',
-        messages: [{ role: 'user', content: finalPrompt }],
-        temperature: 0.7
+        model: "meta-llama/Llama-3-70b-chat-hf",
+        messages: [
+          {
+            role: "system",
+            content:
+              "أجب على الأسئلة القانونية باللغة العربية فقط، وبأسلوب قانوني رسمي مبسط، واحصر الإجابة على القانون اليمني فقط.",
+          },
+          {
+            role: "user",
+            content: question,
+          },
+        ],
+        temperature: 0.7,
       },
       {
         headers: {
-          'Authorization': `Bearer ${API_KEY}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${process.env.TOGETHER_API_KEY}`,
+          "Content-Type": "application/json",
+        },
       }
     );
 
-    const reply = response.data.choices[0].message.content;
-    res.json({ answer: reply });
+    const answer = response.data.choices[0].message.content;
+    res.json({ answer });
   } catch (error) {
-    console.error('Together.ai Error:', error.response?.data || error.message);
-    res.status(500).json({ answer: 'حدث خطأ أثناء الاتصال بالنموذج. حاول لاحقًا.' });
+    console.error("❌ GPT Error:", error.message);
+    res.status(500).json({
+      answer: "❌ حدث خطأ أثناء الاتصال بالخادم. تأكد من توفر المفتاح أو الرصيد.",
+    });
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`✅ Legal Assistant is running on port ${port}`);
 });
