@@ -7,6 +7,9 @@ require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 10000;
 
+// ✅ هذا السطر يعرض ملفات HTML من مجلد public
+app.use(express.static("public"));
+
 app.use(cors());
 app.use(bodyParser.json());
 
