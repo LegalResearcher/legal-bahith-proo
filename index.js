@@ -10,7 +10,6 @@ const port = process.env.PORT || 10000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// نقطة الاستقبال لأسئلة المستخدم
 app.post("/ask", async (req, res) => {
   const question = req.body.question;
 
@@ -27,14 +26,14 @@ app.post("/ask", async (req, res) => {
           {
             role: "system",
             content:
-              "أجب على الأسئلة القانونية باللغة العربية فقط، وبأسلوب قانوني رسمي مبسط، واحصر الإجابة على القانون اليمني فقط.",
+              "أنت مساعد قانوني يمني. أجب فقط باللغة العربية، بأسلوب قانوني رسمي، وضمن حدود القوانين اليمنية فقط. لا تتحدث عن قوانين الدول الأخرى.",
           },
           {
             role: "user",
             content: question,
           },
         ],
-        temperature: 0.7,
+        temperature: 0.5,
       },
       {
         headers: {
