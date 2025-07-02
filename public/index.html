@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>منصة الباحث القانوني ⚖️</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      color: #222;
+      direction: rtl;
+    }
+    header {
+      background: linear-gradient(to left, #003973, #E5E5BE);
+      color: white;
+      padding: 25px 15px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+    }
+    header p {
+      margin: 5px 0 0;
+      font-size: 16px;
+      color: #f0f0f0;
+    }
+    .container {
+      max-width: 700px;
+      margin: 30px auto;
+      background: white;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.08);
+    }
+    textarea {
+      width: 100%;
+      padding: 15px;
+      font-size: 16px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    button {
+      background: linear-gradient(135deg, #28a745, #218838);
+      color: white;
+      font-size: 16px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button:hover {
+      background: linear-gradient(135deg, #218838, #1e7e34);
+    }
+    #answer {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f9f9f9;
+      border-right: 4px solid #28a745;
+      border-radius: 8px;
+      min-height: 50px;
+      white-space: pre-wrap;
+    }
+    footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 14px;
+      color: #666;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>⚖️ منصة الباحث القانوني</h1>
+    <p>مرحبًا بك في منصة الباحث القانوني – مساعدك القانوني اليمني المعتمد للإجابة الدقيقة على استفساراتك القانونية فورًا.</p>
+  </header>
+  <div class="container">
+    <textarea id="question" placeholder="اكتب سؤالك القانوني هنا..."></textarea>
+    <button onclick="sendQuestion()">📩 إرسال السؤال</button>
+    <div id="answer"></div>
+  </div>
+  <footer>
+    جميع الحقوق محفوظة 2024© منصة الباحث القانوني – أ.معين الناصر
+  </footer>
+  <script>
+    async function sendQuestion() {
+      const question = document.getElementById("question").value.trim();
+      const answerDiv = document.getElementById("answer");
+      if (!question) {
+        answerDiv.textContent = "⚠️ الرجاء كتابة سؤال قبل الإرسال.";
+        return;
+      }
+      answerDiv.textContent = "⏳ جاري معالجة السؤال...";
+      try {
+        const response = await fetch("/ask", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ question })
+        });
+        const data = await response.json();
+        answerDiv.textContent = data.answer || "❌ لم يتم العثور على إجابة.";
+      } catch (error) {
+        answerDiv.textContent = "❌ حدث خطأ أثناء الاتصال بالخادم.";
+      }
+    }
+  </script>
+</body>
+</html>
